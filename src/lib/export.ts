@@ -666,6 +666,11 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   y = drawTextBlock('Remark:', data.incidentRemark, y, 12);
 
   // Sign-Off
+  if (y > 230) {
+    doc.addPage();
+    drawPageHeader();
+    y = 27;
+  }
   y = drawSectionLine(y + 2);
   drawLabel("SIGN-OFF (Staff Declaration)", 14, y, 11); y += 8;
   doc.setFontSize(8); doc.setFont('helvetica', 'italic');
