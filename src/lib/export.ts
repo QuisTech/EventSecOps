@@ -527,6 +527,7 @@ export interface FilledReportData {
   incidentRemark: string;
   // Sign-Off
   officerSignature: string; supervisorSignature: string; signOffDate: string; supervisorSignDate: string;
+  declarationStaffName: string; declarationDate: string;
 }
 
 export const exportFilledReportToPDF = (data: FilledReportData) => {
@@ -666,8 +667,12 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
 
   // Sign-Off
   y = drawSectionLine(y + 2);
-  drawLabel("SIGN-OFF (Staff Declaration)", 14, y, 11); y += 10;
-  doc.setFontSize(9);
+  drawLabel("SIGN-OFF (Staff Declaration)", 14, y, 11); y += 8;
+  doc.setFontSize(8); doc.setFont('helvetica', 'italic');
+  const declarationText = `I, ${data.declarationStaffName || '________________'}, declare that the above information is a true representation of the activities and incidents observed during my shift on ${data.declarationDate || '____________'}.`;
+  doc.text(doc.splitTextToSize(declarationText, 180), 14, y);
+  y += 12;
+  doc.setFontSize(9); doc.setFont('helvetica', 'bold');
   doc.text(`Reporting Staff Signature: ${data.officerSignature || '____________________'}`, 14, y);
   doc.text(`Manager Signature: ${data.supervisorSignature || '____________________'}`, 110, y);
   y += 10;

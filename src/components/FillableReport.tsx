@@ -23,6 +23,7 @@ const initialData: FilledReportData = {
   incidentRemark: '',
   // Sign-Off
   officerSignature: '', supervisorSignature: '', signOffDate: '', supervisorSignDate: '',
+  declarationStaffName: '', declarationDate: '',
 };
 
 type K = keyof FilledReportData;
@@ -222,8 +223,24 @@ export default function FillableReport() {
 
         {/* Sign-Off (Staff Declaration) */}
         <Section title="Sign-Off (Staff Declaration)">
-          <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-200 mb-6 font-mono text-xs">
-            <p>I, <span className="font-bold underline uppercase">{data.officerName || '________________'}</span>, declare that the above information is a true representation of the activities and incidents observed during my shift on {data.reportDate || '____________'}.</p>
+          <div className="bg-zinc-50 p-6 rounded-lg border border-zinc-200 mb-6 font-mono text-sm leading-relaxed">
+            <p className="flex flex-wrap items-center gap-2">
+              I, 
+              <input 
+                type="text" 
+                placeholder="Full Name" 
+                className="border-b border-zinc-400 bg-transparent px-2 focus:outline-none focus:border-zinc-900 min-w-[200px]"
+                value={data.declarationStaffName}
+                onChange={e => setData(prev => ({ ...prev, declarationStaffName: e.target.value }))}
+              />, 
+              declare that the above information is a true representation of the activities and incidents observed during my shift on 
+              <input 
+                type="date" 
+                className="border-b border-zinc-400 bg-transparent px-2 focus:outline-none focus:border-zinc-900"
+                value={data.declarationDate}
+                onChange={e => setData(prev => ({ ...prev, declarationDate: e.target.value }))}
+              />.
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-6 pt-4">
             <div className="space-y-4">
