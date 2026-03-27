@@ -13,6 +13,13 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
+// --- VALIDATION (Only for debugging build/deployment issues) ---
+if (!firebaseConfig.apiKey) {
+  console.error("❌ Firebase Error: VITE_FIREBASE_API_KEY is missing! Check your environment variables.");
+} else if (firebaseConfig.apiKey.startsWith('"') || firebaseConfig.apiKey.includes(' ')) {
+  console.error("❌ Firebase Error: API Key contains extra quotes or spaces. Check your Versel settings.");
+}
+
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, import.meta.env.VITE_FIREBASE_FIRESTORE_DB_ID);
 export const auth = getAuth(app);
