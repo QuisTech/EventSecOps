@@ -13,7 +13,7 @@ import SignInButton from './components/SignInButton';
 import { Calendar, FileText, ClipboardList, FileEdit } from 'lucide-react';
 
 export default function App() {
-  const [view, setView] = useState<'schedule' | 'submit' | 'fill' | 'review'>('submit');
+  const [view, setView] = useState<'schedule' | 'submit' | 'fill' | 'review'>('fill');
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function App() {
         e.preventDefault();
         setIsAdmin(prev => {
           const next = !prev;
-          if (!next && view === 'schedule') setView('submit');
+          if (!next && (view === 'schedule' || view === 'submit' || view === 'review')) setView('fill');
           return next;
         });
       }
@@ -39,9 +39,9 @@ export default function App() {
 
   const navItems = [
     { id: 'schedule', label: 'Schedule', icon: Calendar, adminOnly: true },
-    { id: 'submit', label: 'Submit Report', icon: FileText },
+    { id: 'submit', label: 'Submit Report', icon: FileText, adminOnly: true },
     { id: 'fill', label: 'Fill Report', icon: FileEdit },
-    { id: 'review', label: 'Review Reports', icon: ClipboardList },
+    { id: 'review', label: 'Review Reports', icon: ClipboardList, adminOnly: true },
   ].filter(item => !item.adminOnly || isAdmin);
 
   return (
