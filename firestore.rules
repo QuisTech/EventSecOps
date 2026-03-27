@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /reports/{reportId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && 
+                       request.resource.data.authorUid == request.auth.uid &&
+                       request.resource.data.reportType in ['activity', 'incident'] &&
+                       request.resource.data.who is string && request.resource.data.who.size() < 100 &&
+                       request.resource.data.what is string && request.resource.data.what.size() < 1000 &&
+                       request.resource.data.when is string &&
+                       request.resource.data.where is string && request.resource.data.where.size() < 100 &&
+                       request.resource.data.latitude is number &&
+                       request.resource.data.longitude is number &&
+                       request.resource.data.why is string && request.resource.data.why.size() < 1000 &&
+                       request.resource.data.how is string && request.resource.data.how.size() < 1000 &&
+                       request.resource.data.createdAt is string;
+      allow update, delete: if false;
+    }
+  }
+}

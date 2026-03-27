@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "Report": {
+      "title": "Report",
+      "description": "A security surveillance report based on 5W1H.",
+      "type": "object",
+      "properties": {
+        "reportType": { "type": "string", "enum": ["activity", "incident"], "description": "Type of report." },
+        "who": { "type": "string", "description": "Who was involved?" },
+        "what": { "type": "string", "description": "What happened?" },
+        "when": { "type": "string", "format": "date-time", "description": "When did it happen?" },
+        "where": { "type": "string", "description": "Where did it happen (Zone/Location)?" },
+        "latitude": { "type": "number", "description": "Latitude of the incident." },
+        "longitude": { "type": "number", "description": "Longitude of the incident." },
+        "why": { "type": "string", "description": "Why did it happen?" },
+        "how": { "type": "string", "description": "How did it happen?" },
+        "imageUrl": { "type": "string", "description": "URL of the incident picture." },
+        "authorUid": { "type": "string", "description": "UID of the staff who submitted the report." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of report creation." }
+      },
+      "required": ["reportType", "who", "what", "when", "where", "latitude", "longitude", "why", "how", "authorUid", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Collection of security surveillance reports."
+    }
+  }
+}

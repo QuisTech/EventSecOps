@@ -1,0 +1,5 @@
+{
+  "name": "Staff Schedule Manager",
+  "description": "A beautiful dashboard to view and export staff schedules as PDF and Word documents.",
+  "requestFramePermissions": []
+}
