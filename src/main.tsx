@@ -8,3 +8,5 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
+
+console.log("🚀 Surveillance Ops v1.0.1+fix-env-v3");
