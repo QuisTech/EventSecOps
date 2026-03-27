@@ -692,14 +692,17 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
 
   y = drawTextBlock('Follow-Up Action Required:', data.followUpAction, y, 14);
 
-  // ═══ SECTION E + SIGN-OFF (same page if space) ═══
-  y = drawSectionLine(y);
+  // ═══ PAGE 4: FINAL ASSESSMENT + SIGN-OFF ═══
+  doc.addPage();
+  drawPageHeader();
+  y = 28;
+
   drawLabel("SECTION E — FINAL ASSESSMENT", 14, y, 11); y += 7;
   y = drawTwoCol('Overall Event Impact:', data.overallImpact, 'Security Effectiveness:', data.securityEffectiveness, y);
   y = drawTextBlock('Recommendations:', data.recommendations, y, 16);
 
-  y = drawSectionLine(y);
-  drawLabel("SIGN-OFF", 14, y, 11); y += 8;
+  y = drawSectionLine(y + 4);
+  drawLabel("SIGN-OFF", 14, y, 11); y += 10;
   doc.setFontSize(9);
   doc.text("Reporting Officer Signature: ____________________", 14, y);
   doc.text("Supervisor Signature: ____________________", 110, y);
