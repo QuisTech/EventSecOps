@@ -525,6 +525,8 @@ export interface FilledReportData {
   poiActivity: string; sightingNature: string;
   evidenceCollected: string; immediateAction: string; notificationsMade: string; followUpAction: string;
   incidentRemark: string;
+  // Sign-Off
+  officerSignature: string; supervisorSignature: string; signOffDate: string; supervisorSignDate: string;
 }
 
 export const exportFilledReportToPDF = (data: FilledReportData) => {
@@ -664,13 +666,13 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
 
   // Sign-Off
   y = drawSectionLine(y + 2);
-  drawLabel("SIGN-OFF", 14, y, 11); y += 10;
+  drawLabel("SIGN-OFF (Staff Declaration)", 14, y, 11); y += 10;
   doc.setFontSize(9);
-  doc.text("Reporting Officer Signature: ____________________", 14, y);
-  doc.text("Supervisor Signature: ____________________", 110, y);
+  doc.text(`Reporting Staff Signature: ${data.officerSignature || '____________________'}`, 14, y);
+  doc.text(`Manager Signature: ${data.supervisorSignature || '____________________'}`, 110, y);
   y += 10;
-  doc.text("Date / Time: ____________________", 14, y);
-  doc.text("Date / Time: ____________________", 110, y);
+  doc.text(`Date / Time: ${data.signOffDate || '____________________'}`, 14, y);
+  doc.text(`Date / Time: ${data.supervisorSignDate || '____________________'}`, 110, y);
 
   doc.save('security_surveillance_report_filled.pdf');
 };

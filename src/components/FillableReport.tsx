@@ -21,6 +21,8 @@ const initialData: FilledReportData = {
   poiActivity: '', sightingNature: '',
   evidenceCollected: '', immediateAction: '', notificationsMade: '', followUpAction: '',
   incidentRemark: '',
+  // Sign-Off
+  officerSignature: '', supervisorSignature: '', signOffDate: '', supervisorSignDate: '',
 };
 
 type K = keyof FilledReportData;
@@ -218,19 +220,19 @@ export default function FillableReport() {
           </div>
         </Section>
 
-        {/* Sign-Off */}
+        {/* Sign-Off (Staff Declaration) */}
         <Section title="Sign-Off (Staff Declaration)">
           <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-200 mb-6 font-mono text-xs">
             <p>I, <span className="font-bold underline uppercase">{data.officerName || '________________'}</span>, declare that the above information is a true representation of the activities and incidents observed during my shift on {data.reportDate || '____________'}.</p>
           </div>
           <div className="grid grid-cols-2 gap-6 pt-4">
-            <div>
-              <p className="text-sm font-semibold text-zinc-700 mb-8">Reporting Officer Signature: ____________________</p>
-              <p className="text-sm text-zinc-600">Date / Time: ____________________</p>
+            <div className="space-y-4">
+              <Field label="Reporting Staff Signature (Type Name)" name="officerSignature" value={data.officerSignature} onChange={update} />
+              <Field label="Date / Time" name="signOffDate" value={data.signOffDate} onChange={update} type="datetime-local" />
             </div>
-            <div>
-              <p className="text-sm font-semibold text-zinc-700 mb-8">Supervisor Signature: ____________________</p>
-              <p className="text-sm text-zinc-600">Date / Time: ____________________</p>
+            <div className="space-y-4">
+              <Field label="Manager Signature (Type Name)" name="supervisorSignature" value={data.supervisorSignature} onChange={update} />
+              <Field label="Date / Time" name="supervisorSignDate" value={data.supervisorSignDate} onChange={update} type="datetime-local" />
             </div>
           </div>
         </Section>
