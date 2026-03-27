@@ -514,13 +514,17 @@ export interface FilledReportData {
   officerName: string; badgeId: string; shift: string; postZone: string; supervisor: string; contactNo: string;
   // Activity Report
   dutySummary: string;
+  shiftCommencement: string;
+  shiftTermination: string;
   patrolLog: PatrolLogEntry[];
   crowdSize: string; crowdBehavior: string;
   equipmentStatus: string; endOfShiftRemarks: string;
   // Incident Report
   incidentRefNo: string; incidentSeverity: string; incidentDateTime: string; incidentLocation: string;
   incidentType: string; personsInvolved: string; incidentNarrative: string;
+  poiActivity: string; sightingNature: string;
   evidenceCollected: string; immediateAction: string; notificationsMade: string; followUpAction: string;
+  incidentRemark: string;
 }
 
 export const exportFilledReportToPDF = (data: FilledReportData) => {
@@ -597,6 +601,7 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
 
   y = drawSectionLine(y + 2);
   drawLabel("SECTION B — DAILY ACTIVITY REPORT", 14, y, 11); y += 7;
+  y = drawTwoCol('Shift Commencement:', data.shiftCommencement, 'Shift Termination:', data.shiftTermination, y);
   y = drawTextBlock('Duty Summary / Briefing Notes:', data.dutySummary, y, 18);
 
   // Patrol Log table
@@ -647,12 +652,15 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   y = drawTwoCol('Incident Ref No.:', data.incidentRefNo, 'Severity:', data.incidentSeverity, y);
   y = drawTwoCol('Date & Time:', data.incidentDateTime, 'Location / Zone:', data.incidentLocation, y);
   y = drawFieldRow('Type of Incident:', data.incidentType, y, 40);
-  y = drawTextBlock('Person(s) Involved / Witnesses:', data.personsInvolved, y, 16);
-  y = drawTextBlock('Incident Narrative:', data.incidentNarrative, y, 28);
-  y = drawTextBlock('Evidence / Exhibits:', data.evidenceCollected, y, 14);
-  y = drawTextBlock('Immediate Action Taken:', data.immediateAction, y, 16);
-  y = drawTextBlock('Notifications Made:', data.notificationsMade, y, 12);
-  y = drawTextBlock('Follow-Up Action Required:', data.followUpAction, y, 14);
+  y = drawTextBlock('Person(s) Involved / Witnesses (POI):', data.personsInvolved, y, 14);
+  y = drawTextBlock('Activity Spotted:', data.poiActivity, y, 12);
+  y = drawTextBlock('Incident Narrative / Description of Notice:', data.incidentNarrative, y, 22);
+  y = drawTextBlock('Nature of Sighting:', data.sightingNature, y, 12);
+  y = drawTextBlock('Evidence / Exhibits:', data.evidenceCollected, y, 12);
+  y = drawTextBlock('Immediate Action Taken:', data.immediateAction, y, 14);
+  y = drawTextBlock('Notifications Made:', data.notificationsMade, y, 11);
+  y = drawTextBlock('Follow-Up Action Required:', data.followUpAction, y, 12);
+  y = drawTextBlock('Remark:', data.incidentRemark, y, 12);
 
   // Sign-Off
   y = drawSectionLine(y + 2);

@@ -10,13 +10,17 @@ const initialData: FilledReportData = {
   officerName: '', badgeId: '', shift: '', postZone: '', supervisor: '', contactNo: '',
   // Activity Report
   dutySummary: '',
+  shiftCommencement: '',
+  shiftTermination: '',
   patrolLog: [{ time: '', area: '', observations: '', action: '' }],
   crowdSize: '', crowdBehavior: '',
   equipmentStatus: '', endOfShiftRemarks: '',
   // Incident Report
   incidentRefNo: '', incidentSeverity: '', incidentDateTime: '', incidentLocation: '',
   incidentType: '', personsInvolved: '', incidentNarrative: '',
+  poiActivity: '', sightingNature: '',
   evidenceCollected: '', immediateAction: '', notificationsMade: '', followUpAction: '',
+  incidentRemark: '',
 };
 
 type K = keyof FilledReportData;
@@ -125,8 +129,12 @@ export default function FillableReport() {
         </Section>
 
         {/* Section B: Daily Activity Report */}
-        <Section title="Section B — Daily Activity Report">
-          <Field label="Duty Summary / Briefing Notes" name="dutySummary" value={data.dutySummary} onChange={update} span type="textarea" />
+        <Section title="Section B — Daily Activity Report (Monitoring Activities)">
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <Field label="Shift Commencement" name="shiftCommencement" value={data.shiftCommencement} onChange={update} type="time" />
+            <Field label="Shift Termination" name="shiftTermination" value={data.shiftTermination} onChange={update} type="time" />
+          </div>
+          <Field label="Duty Description / Briefing Notes" name="dutySummary" value={data.dutySummary} onChange={update} span type="textarea" />
 
           <div className="flex justify-between items-center mt-4 mb-2 border-b border-zinc-200 pb-1">
             <h4 className="text-sm font-bold text-zinc-700">Patrol & Activity Log</h4>
@@ -194,21 +202,27 @@ export default function FillableReport() {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Incident Reference No." name="incidentRefNo" value={data.incidentRefNo} onChange={update} />
             <SelectField label="Severity" name="incidentSeverity" value={data.incidentSeverity} onChange={update} options={['Low', 'Medium', 'High', 'Critical']} />
-            <Field label="Date & Time" name="incidentDateTime" value={data.incidentDateTime} onChange={update} type="datetime-local" />
+            <Field label="Date & Time of Report" name="incidentDateTime" value={data.incidentDateTime} onChange={update} type="datetime-local" />
             <Field label="Location / Zone" name="incidentLocation" value={data.incidentLocation} onChange={update} />
             <SelectField label="Type of Incident" name="incidentType" value={data.incidentType} onChange={update} span
               options={['Theft', 'Intrusion / Unauthorized Access', 'Assault / Altercation', 'Medical', 'Fire / Safety Hazard', 'Suspicious Activity', 'Crowd Disturbance', 'Attempted Stage/VIP Breach', 'Other']} />
-            <Field label="Persons Involved / Witnesses" name="personsInvolved" value={data.personsInvolved} onChange={update} span type="textarea" />
-            <Field label="Incident Narrative" name="incidentNarrative" value={data.incidentNarrative} onChange={update} span type="textarea" hint="Detailed, factual description" />
+            <Field label="Person of Interest (POI) / Witnesses" name="personsInvolved" value={data.personsInvolved} onChange={update} span type="textarea" />
+            <Field label="Activity Spotted" name="poiActivity" value={data.poiActivity} onChange={update} span type="textarea" />
+            <Field label="Incident Narrative / Description of Notice" name="incidentNarrative" value={data.incidentNarrative} onChange={update} span type="textarea" hint="Detailed, factual description" />
+            <Field label="Nature of Sighting" name="sightingNature" value={data.sightingNature} onChange={update} span type="textarea" />
             <Field label="Evidence / Exhibits" name="evidenceCollected" value={data.evidenceCollected} onChange={update} span type="textarea" />
             <Field label="Immediate Action Taken" name="immediateAction" value={data.immediateAction} onChange={update} span type="textarea" />
             <Field label="Notifications Made" name="notificationsMade" value={data.notificationsMade} onChange={update} span type="textarea" hint="Police / Fire / Medical / Management — include time" />
             <Field label="Follow-Up Action Required" name="followUpAction" value={data.followUpAction} onChange={update} span type="textarea" />
+            <Field label="Remark" name="incidentRemark" value={data.incidentRemark} onChange={update} span type="textarea" />
           </div>
         </Section>
 
         {/* Sign-Off */}
-        <Section title="Sign-Off">
+        <Section title="Sign-Off (Staff Declaration)">
+          <div className="bg-zinc-50 p-4 rounded-lg border border-zinc-200 mb-6 font-mono text-xs">
+            <p>I, <span className="font-bold underline uppercase">{data.officerName || '________________'}</span>, declare that the above information is a true representation of the activities and incidents observed during my shift on {data.reportDate || '____________'}.</p>
+          </div>
           <div className="grid grid-cols-2 gap-6 pt-4">
             <div>
               <p className="text-sm font-semibold text-zinc-700 mb-8">Reporting Officer Signature: ____________________</p>
