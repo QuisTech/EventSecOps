@@ -10,7 +10,7 @@ const initialData: FilledReportData = {
   officerName: '', badgeId: '', shift: '', postZone: '', supervisor: '', contactNo: '',
   // Activity Report
   dutySummary: '',
-  patrolTime: '', patrolArea: '', patrolObservations: '', patrolAction: '',
+  patrolLog: [{ time: '', area: '', observations: '', action: '' }],
   crowdSize: '', crowdBehavior: '',
   equipmentStatus: '', endOfShiftRemarks: '',
   // Incident Report
@@ -128,12 +128,57 @@ export default function FillableReport() {
         <Section title="Section B — Daily Activity Report">
           <Field label="Duty Summary / Briefing Notes" name="dutySummary" value={data.dutySummary} onChange={update} span type="textarea" />
 
-          <h4 className="text-sm font-bold text-zinc-700 mt-4 mb-2 border-b border-zinc-200 pb-1">Patrol & Activity Log</h4>
-          <div className="grid grid-cols-4 gap-3">
-            <Field label="Time" name="patrolTime" value={data.patrolTime} onChange={update} />
-            <Field label="Area / Zone" name="patrolArea" value={data.patrolArea} onChange={update} />
-            <Field label="Observations & Findings" name="patrolObservations" value={data.patrolObservations} onChange={update} />
-            <Field label="Action Taken" name="patrolAction" value={data.patrolAction} onChange={update} />
+          <div className="flex justify-between items-center mt-4 mb-2 border-b border-zinc-200 pb-1">
+            <h4 className="text-sm font-bold text-zinc-700">Patrol & Activity Log</h4>
+            <button 
+              onClick={() => setData(prev => ({ ...prev, patrolLog: [...prev.patrolLog, { time: '', area: '', observations: '', action: '' }] }))}
+              className="text-xs font-bold bg-zinc-900 text-white px-3 py-1 rounded hover:bg-zinc-800 transition-colors"
+            >
+              + Add Row
+            </button>
+          </div>
+          
+          <div className="space-y-4">
+            {data.patrolLog.map((entry, idx) => (
+              <div key={idx} className="relative grid grid-cols-4 gap-3 p-4 bg-zinc-50 rounded-lg border border-zinc-200">
+                {data.patrolLog.length > 1 && (
+                  <button 
+                    onClick={() => setData(prev => ({ ...prev, patrolLog: prev.patrolLog.filter((_, i) => i !== idx) }))}
+                    className="absolute -right-2 -top-2 bg-white border border-zinc-200 text-zinc-400 hover:text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-sm"
+                  >
+                    ×
+                  </button>
+                )}
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Time</label>
+                  <input type="text" value={entry.time} onChange={e => {
+                    const newLog = [...data.patrolLog]; newLog[idx].time = e.target.value;
+                    setData(prev => ({ ...prev, patrolLog: newLog }));
+                  }} className="w-full p-2 border border-zinc-300 rounded text-sm bg-white" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Area / Zone</label>
+                  <input type="text" value={entry.area} onChange={e => {
+                    const newLog = [...data.patrolLog]; newLog[idx].area = e.target.value;
+                    setData(prev => ({ ...prev, patrolLog: newLog }));
+                  }} className="w-full p-2 border border-zinc-300 rounded text-sm bg-white" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Observations & Findings</label>
+                  <input type="text" value={entry.observations} onChange={e => {
+                    const newLog = [...data.patrolLog]; newLog[idx].observations = e.target.value;
+                    setData(prev => ({ ...prev, patrolLog: newLog }));
+                  }} className="w-full p-2 border border-zinc-300 rounded text-sm bg-white" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">Action Taken</label>
+                  <input type="text" value={entry.action} onChange={e => {
+                    const newLog = [...data.patrolLog]; newLog[idx].action = e.target.value;
+                    setData(prev => ({ ...prev, patrolLog: newLog }));
+                  }} className="w-full p-2 border border-zinc-300 rounded text-sm bg-white" />
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="grid grid-cols-2 gap-4 mt-4">

@@ -486,19 +486,6 @@ export const exportReportTemplateToWord = async () => {
           label("Incident Narrative (detailed description):"),
           inputCell(5),
 
-          label("Evidence / Exhibits Collected:"),
-          inputCell(3),
-
-          label("Immediate Action Taken:"),
-          inputCell(3),
-
-          label("Notifications Made:"),
-          new Paragraph({ children: [new TextRun({ text: "(Police / Fire Service / Medical / Management / Other — include time notified)", italics: true, size: 16, color: '888888' })], spacing: { after: 40 } }),
-          inputCell(2),
-
-          label("Follow-Up Action Required:"),
-          inputCell(3),
-
           new Paragraph({ children: [new TextRun({ text: "Reporting Officer Signature: ____________________          Supervisor Signature: ____________________", size: 18 })], spacing: { before: 400 } }),
           new Paragraph({ children: [new TextRun({ text: "Date / Time: ____________________                                  Date / Time: ____________________", size: 18 })], spacing: { before: 200 } }),
         ],
@@ -507,10 +494,17 @@ export const exportReportTemplateToWord = async () => {
   });
 
   const blob = await Packer.toBlob(doc);
-  saveAs(blob, 'security_surveillance_report.docx');
+  saveAs(blob, 'security_surveillance_report_template.docx');
 };
 
 // ==================== FILLED REPORT PDF ====================
+export interface PatrolLogEntry {
+  time: string;
+  area: string;
+  observations: string;
+  action: string;
+}
+
 export interface FilledReportData {
   // Report Classification
   reportType: string; eventName: string; client: string; venue: string; reportDate: string;
@@ -520,7 +514,7 @@ export interface FilledReportData {
   officerName: string; badgeId: string; shift: string; postZone: string; supervisor: string; contactNo: string;
   // Activity Report
   dutySummary: string;
-  patrolTime: string; patrolArea: string; patrolObservations: string; patrolAction: string;
+  patrolLog: PatrolLogEntry[];
   crowdSize: string; crowdBehavior: string;
   equipmentStatus: string; endOfShiftRemarks: string;
   // Incident Report
@@ -609,19 +603,26 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   drawLabel('Patrol & Activity Log:', 14, y); y += 5;
   const cw = [25, 40, 70, 47];
   const ch = ['Time', 'Area / Zone', 'Observations & Findings', 'Action Taken'];
-  const cv = [data.patrolTime, data.patrolArea, data.patrolObservations, data.patrolAction];
+  
   doc.setFillColor(39, 39, 42); doc.rect(14, y, 182, 9, 'F');
   doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(255);
   let xp = 14;
   ch.forEach((h, i) => { doc.text(h, xp + 2, y + 6); xp += cw[i]; });
   doc.setTextColor(0); doc.setFont('helvetica', 'normal'); y += 9;
-  xp = 14;
-  cw.forEach((w, i) => {
-    doc.setDrawColor(200); doc.rect(xp, y, w, 14); doc.setDrawColor(0);
-    doc.setFontSize(7); doc.text(doc.splitTextToSize(cv[i] || '', w - 4), xp + 2, y + 5);
-    xp += w;
+
+  // Draw each row
+  const logs = data.patrolLog && data.patrolLog.length > 0 ? data.patrolLog : [{ time: '', area: '', observations: '', action: '' }];
+  logs.forEach(log => {
+    xp = 14;
+    const rowValues = [log.time, log.area, log.observations, log.action];
+    cw.forEach((w, i) => {
+      doc.setDrawColor(200); doc.rect(xp, y, w, 12); doc.setDrawColor(0);
+      doc.setFontSize(7); doc.text(doc.splitTextToSize(rowValues[i] || '', w - 4), xp + 2, y + 5);
+      xp += w;
+    });
+    y += 12;
   });
-  y += 19;
+  y += 6;
 
   // Crowd fields
   y = drawTwoCol('Estimated Crowd Size:', data.crowdSize, 'Crowd Behavior:', data.crowdBehavior, y);
