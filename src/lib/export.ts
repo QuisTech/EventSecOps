@@ -510,41 +510,30 @@ export const exportReportTemplateToWord = async () => {
   saveAs(blob, 'security_surveillance_report.docx');
 };
 
-// ==================== GENERATE FILLED REPORT PDF (Political Events) ====================
+// ==================== FILLED REPORT PDF ====================
 export interface FilledReportData {
   // Report Classification
   reportType: string; eventName: string; client: string; venue: string; reportDate: string;
-  // Core Incident Snapshot
+  // Core Snapshot (5W1H)
   who: string; what: string; when: string; where: string; latLong: string; why: string; how: string;
   // Officer Details
   officerName: string; badgeId: string; shift: string; postZone: string; supervisor: string; contactNo: string;
-  // Event & Crowd Overview
-  crowdSize: string; crowdBehavior: string; protesters: string; riskLevel: string;
-  // Daily Activity Report
+  // Activity Report
   dutySummary: string;
-  patrolTime: string; patrolArea: string; patrolObservations: string; patrolAction: string; patrolSource: string;
-  entryExitStatus: string; unauthorizedAccess: string; restrictedBreaches: string;
-  radios: string; cctv: string; barriers: string; otherEquipment: string;
-  areasCovered: string; clientAssetIssues: string;
-  endOfShiftRemarks: string;
+  patrolTime: string; patrolArea: string; patrolObservations: string; patrolAction: string;
+  crowdSize: string; crowdBehavior: string;
+  equipmentStatus: string; endOfShiftRemarks: string;
   // Incident Report
   incidentRefNo: string; incidentSeverity: string; incidentDateTime: string; incidentLocation: string;
   incidentType: string; personsInvolved: string; incidentNarrative: string;
-  crowdAffected: string; crowdReaction: string; evidenceCollected: string; immediateAction: string;
-  escalationReportedTo: string; escalationOrg: string; escalationTime: string; escalationResponse: string;
-  followUpAction: string;
-  // Final Assessment
-  overallImpact: string; securityEffectiveness: string; recommendations: string;
+  evidenceCollected: string; immediateAction: string; notificationsMade: string; followUpAction: string;
 }
 
 export const exportFilledReportToPDF = (data: FilledReportData) => {
   const doc = new jsPDF();
 
   const drawLabel = (text: string, x: number, y: number, size = 10) => {
-    doc.setFontSize(size);
-    doc.setFont('helvetica', 'bold');
-    doc.text(text, x, y);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(size); doc.setFont('helvetica', 'bold'); doc.text(text, x, y); doc.setFont('helvetica', 'normal');
   };
 
   const drawFieldRow = (label: string, value: string, yPos: number, lw = 55) => {
@@ -565,12 +554,19 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   };
 
   const drawTextBlock = (labelText: string, value: string, yPos: number, blockH = 18) => {
-    drawLabel(labelText, 14, yPos);
-    yPos += 4;
+    drawLabel(labelText, 14, yPos); yPos += 4;
     doc.setDrawColor(200); doc.rect(14, yPos, 182, blockH); doc.setDrawColor(0);
     doc.setFontSize(9); doc.setFont('helvetica', 'normal');
     doc.text(doc.splitTextToSize(value || '', 178), 16, yPos + 5);
     return yPos + blockH + 4;
+  };
+
+  const drawPageHeader = () => {
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+    doc.text("SECURITY SURVEILLANCE REPORT", 105, 14, { align: 'center' });
+    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
+    doc.text("CONFIDENTIAL — For Internal & Client Use Only", 105, 19, { align: 'center' });
+    doc.setDrawColor(39, 39, 42); doc.setLineWidth(0.5); doc.line(14, 22, 196, 22); doc.setLineWidth(0.2); doc.setDrawColor(0);
   };
 
   const drawSectionLine = (yPos: number) => {
@@ -578,18 +574,9 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
     return yPos + 6;
   };
 
-  const drawPageHeader = () => {
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text("SECURITY SURVEILLANCE REPORT", 105, 14, { align: 'center' });
-    doc.setFontSize(8); doc.setFont('helvetica', 'normal');
-    doc.text("CONFIDENTIAL — For Internal & Client Use Only", 105, 19, { align: 'center' });
-    doc.setDrawColor(39, 39, 42); doc.setLineWidth(0.5); doc.line(14, 22, 196, 22); doc.setLineWidth(0.2); doc.setDrawColor(0);
-  };
-
-  // ═══ PAGE 1: CLASSIFICATION + SNAPSHOT + OFFICER + CROWD ═══
+  // ═══ PAGE 1: REPORT CLASSIFICATION + 5W1H ═══
   drawPageHeader();
-  let y = 31;
+  let y = 27;
 
   drawLabel("REPORT CLASSIFICATION", 14, y, 11); y += 7;
   y = drawFieldRow('Report Type:', data.reportType, y, 40);
@@ -597,37 +584,32 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   y = drawTwoCol('Venue / Location:', data.venue, 'Date:', data.reportDate, y);
 
   y = drawSectionLine(y + 2);
-  drawLabel("CORE INCIDENT SNAPSHOT (Quick Log)", 14, y, 11); y += 7;
+  drawLabel("CORE INCIDENT SNAPSHOT", 14, y, 11); y += 7;
   y = drawFieldRow('Who (Involved):', data.who, y, 40);
   y = drawFieldRow('What (Incident/Activity):', data.what, y, 50);
   y = drawTwoCol('When (Timestamp):', data.when, 'Where (Zone/Location):', data.where, y);
   y = drawTwoCol('Lat / Long:', data.latLong, 'Why (Context / Trigger):', data.why, y);
-  y = drawFieldRow('How (Source):', data.how, y, 30);
+  y = drawFieldRow('How (Methodology / Source):', data.how, y, 55);
 
-  y = drawSectionLine(y + 2);
+  // ═══ PAGE 2: OFFICER DETAILS + ACTIVITY REPORT ═══
+  doc.addPage();
+  drawPageHeader();
+  y = 27;
+
   drawLabel("SECTION A — OFFICER DETAILS", 14, y, 11); y += 7;
   y = drawTwoCol('Officer Name:', data.officerName, 'Badge / ID No.:', data.badgeId, y);
   y = drawTwoCol('Shift:', data.shift, 'Post / Zone Assigned:', data.postZone, y);
   y = drawTwoCol('Supervisor on Duty:', data.supervisor, 'Contact No.:', data.contactNo, y);
 
   y = drawSectionLine(y + 2);
-  drawLabel("SECTION B — EVENT & CROWD OVERVIEW", 14, y, 11); y += 7;
-  y = drawTwoCol('Estimated Crowd Size:', data.crowdSize, 'Crowd Behavior:', data.crowdBehavior, y);
-  y = drawFieldRow('Protesters / Counter-Groups:', data.protesters, y, 60);
-  y = drawFieldRow('General Risk Level:', data.riskLevel, y, 40);
+  drawLabel("SECTION B — DAILY ACTIVITY REPORT", 14, y, 11); y += 7;
+  y = drawTextBlock('Duty Summary / Briefing Notes:', data.dutySummary, y, 18);
 
-  // ═══ PAGE 2: DAILY ACTIVITY REPORT ═══
-  doc.addPage();
-  drawPageHeader();
-  y = 31;
-
-  drawLabel("SECTION C — DAILY ACTIVITY REPORT", 14, y, 11); y += 7;
-  y = drawTextBlock('Duty Summary / Briefing Notes:', data.dutySummary, y, 16);
-
+  // Patrol Log table
   drawLabel('Patrol & Activity Log:', 14, y); y += 5;
-  const cw = [22, 32, 55, 42, 31];
-  const ch = ['Time', 'Area / Zone', 'Observations & Findings', 'Action Taken', 'Source'];
-  const cv = [data.patrolTime, data.patrolArea, data.patrolObservations, data.patrolAction, data.patrolSource];
+  const cw = [25, 40, 70, 47];
+  const ch = ['Time', 'Area / Zone', 'Observations & Findings', 'Action Taken'];
+  const cv = [data.patrolTime, data.patrolArea, data.patrolObservations, data.patrolAction];
   doc.setFillColor(39, 39, 42); doc.rect(14, y, 182, 9, 'F');
   doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(255);
   let xp = 14;
@@ -641,67 +623,38 @@ export const exportFilledReportToPDF = (data: FilledReportData) => {
   });
   y += 19;
 
-  drawLabel('Access Control & Perimeter Monitoring:', 14, y, 10); y += 6;
-  y = drawFieldRow('Entry/Exit Points Status:', data.entryExitStatus, y, 50);
-  y = drawFieldRow('Unauthorized Access Attempts:', data.unauthorizedAccess, y, 60);
-  y = drawFieldRow('Restricted Area Breaches:', data.restrictedBreaches, y, 55);
+  // Crowd fields
+  y = drawTwoCol('Estimated Crowd Size:', data.crowdSize, 'Crowd Behavior:', data.crowdBehavior, y);
 
-  drawLabel('Equipment & Asset Status:', 14, y, 10); y += 6;
-  y = drawTwoCol('Radios:', data.radios, 'CCTV:', data.cctv, y);
-  y = drawTwoCol('Barriers / Fencing:', data.barriers, 'Other Equipment:', data.otherEquipment, y);
+  y = drawTextBlock('Equipment & Asset Status:', data.equipmentStatus, y, 15);
+  y = drawTextBlock('End of Shift Remarks:', data.endOfShiftRemarks, y, 15);
 
-  drawLabel('Client Asset Protection:', 14, y, 10); y += 6;
-  y = drawTwoCol('Areas Covered:', data.areasCovered, 'Issues:', data.clientAssetIssues, y);
+  // Signature block
+  doc.setFontSize(9);
+  doc.text("Officer Signature: ____________________", 14, y + 2);
+  doc.text("Supervisor Signature: ____________________", 110, y + 2);
+  y += 10;
+  doc.text("Date / Time: ____________________", 14, y);
+  doc.text("Date / Time: ____________________", 110, y);
 
-  y = drawTextBlock('End of Shift Remarks:', data.endOfShiftRemarks, y, 16);
-
-  // ═══ PAGE 3: INCIDENT REPORT ═══
+  // ═══ PAGE 3: INCIDENT REPORT + SIGN-OFF ═══
   doc.addPage();
   drawPageHeader();
-  y = 31;
+  y = 27;
 
-  drawLabel("SECTION D — INCIDENT REPORT", 14, y, 11); y += 7;
+  drawLabel("SECTION C — INCIDENT REPORT", 14, y, 11); y += 7;
   y = drawTwoCol('Incident Ref No.:', data.incidentRefNo, 'Severity:', data.incidentSeverity, y);
   y = drawTwoCol('Date & Time:', data.incidentDateTime, 'Location / Zone:', data.incidentLocation, y);
   y = drawFieldRow('Type of Incident:', data.incidentType, y, 40);
-  y = drawTextBlock('Person(s) Involved / Witnesses:', data.personsInvolved, y, 14);
-  y = drawTextBlock('Incident Narrative:', data.incidentNarrative, y, 25);
-
-  drawLabel('Crowd Impact:', 14, y, 10); y += 6;
-  y = drawTwoCol('Did incident affect crowd?', data.crowdAffected, 'Crowd Reaction:', data.crowdReaction, y);
-
-  y = drawTextBlock('Evidence / Exhibits:', data.evidenceCollected, y, 12);
-  y = drawTextBlock('Immediate Action Taken:', data.immediateAction, y, 14);
-
-  drawLabel('Escalation & Communication Log:', 14, y, 10); y += 5;
-  const ew = [46, 46, 30, 60];
-  const eh = ['Reported To', 'Organization', 'Time', 'Response'];
-  const ev = [data.escalationReportedTo, data.escalationOrg, data.escalationTime, data.escalationResponse];
-  doc.setFillColor(39, 39, 42); doc.rect(14, y, 182, 9, 'F');
-  doc.setFontSize(7); doc.setFont('helvetica', 'bold'); doc.setTextColor(255);
-  xp = 14;
-  eh.forEach((h, i) => { doc.text(h, xp + 2, y + 6); xp += ew[i]; });
-  doc.setTextColor(0); doc.setFont('helvetica', 'normal'); y += 9;
-  xp = 14;
-  ew.forEach((w, i) => {
-    doc.setDrawColor(200); doc.rect(xp, y, w, 12); doc.setDrawColor(0);
-    doc.setFontSize(8); doc.text(ev[i] || '', xp + 2, y + 7);
-    xp += w;
-  });
-  y += 17;
-
+  y = drawTextBlock('Person(s) Involved / Witnesses:', data.personsInvolved, y, 16);
+  y = drawTextBlock('Incident Narrative:', data.incidentNarrative, y, 28);
+  y = drawTextBlock('Evidence / Exhibits:', data.evidenceCollected, y, 14);
+  y = drawTextBlock('Immediate Action Taken:', data.immediateAction, y, 16);
+  y = drawTextBlock('Notifications Made:', data.notificationsMade, y, 12);
   y = drawTextBlock('Follow-Up Action Required:', data.followUpAction, y, 14);
 
-  // ═══ PAGE 4: FINAL ASSESSMENT + SIGN-OFF ═══
-  doc.addPage();
-  drawPageHeader();
-  y = 28;
-
-  drawLabel("SECTION E — FINAL ASSESSMENT", 14, y, 11); y += 7;
-  y = drawTwoCol('Overall Event Impact:', data.overallImpact, 'Security Effectiveness:', data.securityEffectiveness, y);
-  y = drawTextBlock('Recommendations:', data.recommendations, y, 16);
-
-  y = drawSectionLine(y + 4);
+  // Sign-Off
+  y = drawSectionLine(y + 2);
   drawLabel("SIGN-OFF", 14, y, 11); y += 10;
   doc.setFontSize(9);
   doc.text("Reporting Officer Signature: ____________________", 14, y);
