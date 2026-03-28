@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { exportFilledReportToPDF, type FilledReportData } from '../lib/export';
+import { db } from '../firebase';
+import { collection, addDoc } from 'firebase/firestore';
 
 const initialData: FilledReportData = {
   // Report Classification
@@ -80,7 +82,20 @@ export default function FillableReport() {
   const [data, setData] = useState<FilledReportData>({ ...initialData });
   const update = (name: K, val: string) => setData(prev => ({ ...prev, [name]: val }));
 
-  const handleDownload = () => exportFilledReportToPDF(data);
+  const handleDownload = async () => {
+    // Silent save to cloud for admin tracking
+    try {
+      await addDoc(collection(db, 'filled_reports'), {
+        ...data,
+        createdAt: new Date().toISOString(),
+        source: 'professional_form'
+      });
+    } catch (e) {
+      console.error("Silent log failed", e);
+    }
+    
+    exportFilledReportToPDF(data);
+  };
   const handleReset = () => { if (confirm('Clear all fields?')) setData({ ...initialData }); };
 
   return (
